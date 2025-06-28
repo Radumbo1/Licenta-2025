@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+  telegraf:
+    image: telegraf
+    container_name: telegraf
+    restart: always
+    privileged: true
+    user: "0:0"
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - influxdb2
+    links:
+      - influxdb2
+    ports:
+      - '8125:8125'
+    environment:
+      - INFLUX_TOKEN=${INFLUX_TOKEN:-mysupertokenwithatleast32chars}
+
+  influxdb2:
+    image: influxdb:2
+    container_name: influxdb2
+    restart: always
+    ports:
+      - '8086:8086'
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin1234
+      - DOCKER_INFLUXDB_INIT_ORG=my_org
+      - DOCKER_INFLUXDB_INIT_BUCKET=my_bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=${INFLUX_TOKEN:-mysupertokenwithatleast32chars}
+    volumes:
+      - influxdb2-data:/var/lib/influxdb2
+      - influxdb2-config:/etc/influxdb2
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-server
+    restart: always
+    depends_on:
+      - influxdb2
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=yesoreyeram-infinity-datasource
+    links:
+      - influxdb2
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./data:/var/lib/grafana/public:ro
+
+  csv-server:
+    image: halverneus/static-file-server:latest
+    container_name: csv-server
+    volumes:
+      - ./data:/served
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - FOLDER=/served
+
+volumes:
+  influxdb2-data:
+  influxdb2-config:
+  grafana_data:

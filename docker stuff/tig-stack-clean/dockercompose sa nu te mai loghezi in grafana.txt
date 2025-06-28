@@ -1,0 +1,85 @@
+NOT TESTED DOCKERCOMPOSE
+
+version: "3"
+
+services:
+  influxdb:
+    image: influxdb:2.1.1
+    volumes:
+      - influxdb-storage:/var/lib/influxdb2:rw
+    env_file:
+      - .env
+    entrypoint: ["./entrypoint.sh"]
+    restart: on-failure:10
+    ports:
+      - ${DOCKER_INFLUXDB_INIT_PORT}:8086
+
+  telegraf:
+    image: telegraf:1.19
+    volumes:
+      - ${TELEGRAF_CFG_PATH}:/etc/telegraf/telegraf.conf:rw
+    env_file:
+      - .env
+    depends_on:
+      - influxdb
+
+  grafana:
+    image: grafana/grafana-oss:8.4.3
+    volumes:
+      - grafana-storage:/var/lib/grafana:rw
+    depends_on:
+      - influxdb
+    ports:
+      - ${GRAFANA_PORT}:3000
+    env_file:
+      - .env
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+
+volumes:
+  influxdb-storage:
+
+
+
+
+
+.ENV FILE
+
+DOCKER_INFLUXDB_INIT_MODE=setup
+
+DOCKER_INFLUXDB_INIT_USERNAME=test
+DOCKER_INFLUXDB_INIT_PASSWORD=password1
+DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=f94eb75372110679c9fbd0ffa140fded87140bdc2b911c9641d339669f8efee3 
+
+DOCKER_INFLUXDB_INIT_ORG=radumbo
+DOCKER_INFLUXDB_INIT_BUCKET=telegrafTEST
+
+DOCKER_INFLUXDB_INIT_RETENTION=2d 
+
+DOCKER_INFLUXDB_INIT_PORT=8086
+DOCKER_INFLUXDB_INIT_HOST=influxdb
+
+GRAFANA_PORT=3000
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=password1
+
+
+
+
+CREEZI grafana/provisioning/datasources/influxdb.yml PENTRU CA SA ISI IA AUTOMAT DATASOURCE U
+
+apiVersion: 1
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    url: http://${DOCKER_INFLUXDB_INIT_HOST}:${DOCKER_INFLUXDB_INIT_PORT}
+    jsonData:
+      version: Flux
+      organization: ${DOCKER_INFLUXDB_INIT_ORG}
+      defaultBucket: ${DOCKER_INFLUXDB_INIT_BUCKET}
+    secureJsonData:
+      token: ${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}

@@ -1,0 +1,7 @@
+am clonat test enviromant pe docker
+am eliminat telegrafu (dupa multe incercari)
+am modificat sketuchu de arduino, scriptu de python
+am adaugat grafana.ini in care imi pun minimul de refreshrate la 1s (vezi docker compose)
+	https://community.grafana.com/t/how-to-change-refresh-rate-from-5s-to-1s/39008/2
+	https://community.grafana.com/t/change-grafana-ini-in-docker-install/27605/2
+succes cat de cat
