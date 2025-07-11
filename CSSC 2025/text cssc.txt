@@ -1,0 +1,127 @@
+Topic obietive context general comparative cu solutii similare si ce aduc nou / original, descriere tehnica (arhitecura, tot vizualizat), rezultate experimentale (grafice) si printscrren uri (de pe google maps si asa), concluzii
+
+originalitate, complexitate, prezentare
+
+State of the Art (mai trebuie sa pun un slide cu solutii similare si aici spun de ce e mai bun sistemul meu, LoRa nu este foarte folosit, avantaje ++ dezavantaje care e o validare experimentala)
+
+
+introducere
+
+Hello everyone, today I’m going to talk about my project titled “Real-time Wireless Telemetry System for a Formula Student Electric Vehicle” by Radu-Gabriel Tompea from the Technical University of Cluj-Napoca, having as a coordinator professor mister Bogdan Iancu.
+
+Telemetry systems play a crucial role in modern automobiles, allowing engineers to monitor and react to sensor data from a vehicle in real time, providing data about battery state, motor temperature, braking behavior, and much more.
+
+However, traditional wired data acquisition systems are impractical during test runs, especially when vehicles are moving dynamically. 
+
+This project proposes a low-cost, real-time wireless telemetry system that helps engineers receive vital information without needing to be in or near the car.
+
+
+
+Formula Student
+
+Formula Student is a global competition that challenges university teams to design, build, and race small single-seater cars. It aims to develop a students ability to innovate and solve problems in a fast paced environment.
+
+This competition became a very valuable way for students to enter the automotive industry, offering young engineers unmatched experience in the technical sphere, but also in leadership, management and time management.
+
+The ART TU Cluj-Napoca team, from the Technical University of Cluj-Napoca, entered this competition with their E17 electric vehicle in 2019. As part of the development of this car, the team needed a robust telemetry system that could deliver reliable, encrypted data to engineers in real time during dynamic tests or races.
+
+
+
+Current status of telemetry systems
+
+Vehicle-to-Everything (V2X) is a generic term that refers to a wireless communication system that allows the exchange of data in real time between a vehicle and any entity in its environment, including other vehicles (V2V), infrastructure (V2I) and communication networks (V2N). The main purpose of this technology is to improve safety on the road and reduce traffic.
+
+Vehicle-To-Network (V2N) is a form of communication that allows the vehicle to transmit information to a large, infrastructural network like cloud servers, data centers and mobile networks to offer external information like traffic conditions and weather, thus permitting the vehicle to take more informed decisions and to enhance driver experience.
+
+Vehicle-To-Vehicle (V2V) is a technology that makes real-time communication between two vehicles possible, without the need for an intermediary infrastructure. They can send information, like speed, direction, braking times and location to better road safety.
+
+
+
+State of the Art 
+
+For the IoT-based Telemetry, the authors presenting a telemetry system that uses OBD-II data and GPS, having 3 components:
+
+	On-board hardware module, using OBD-II interface connected to an Arduino Mega 2560 	to log engine parameters like RPM, speed coolant temperature and throttle position 	as well as the GPS position, storing the data to a microSD and transmitting over 	Bluetooth (HC-05) and GSM/GPRS.
+
+	Android application. It provides the functionality of a user interface and GPS data 	provider, receiving the engine data from the server, displaying live statistics and 	uploading information for speed-of-transmission analysis.
+
+	Web server and database. Based on PostgreSQL, it handles the receiving, storage and 	visualization of the telemetry data.
+
+While having accurate location and long transmission times, it severly lacks in the data processing speed, often having delays over 10 seconds, on top of having unreliable connectivity and hard installation.
+
+For the Real-time video and GPS solution, the authors proposed a system for solar car races that integrate real-time video, GPS positioning, and velocity tracking to monitor and broadcast data.
+It uses GPS for live location and speed, using a Raspberry Pi as an Onboard Unit (OBU), a camera system for live video capture and a wireless transceiver for transmitting all telemetry and video data.
+A wireless point-to-point link is used to establish a connection between the solar car and the tracking vehicle. While innovative with the technologies, it does not transmit high volumes of data over long distances and has very high coupling of the system, using a lot of bandwidth.
+
+
+At last, the authors propose a robust solution for secure remote vehicle diagnosis and maintenance over 5G Vehicle-to-Network (V2N), addressing critical safety and privacy issues with a dedicated authentication scheme. The system includes 3 primary components:
+	Vehicle-side module:  Users authenticate via identity, password, and biometrics, forming a secure connection.
+	Vehicle Networking Control Center: connects to the user and relays fault data, and establishes secure channels for maintenance actions. It also supports direct fault 
+resolution from its database.
+	Vehicle Service Center (VSC): includes a server and employees who must also authenticate using identity, password, and biometrics, allowing diagnosis and online software/firmware repairs. Only if the fault is resolvable online is service performed remotely; otherwise, physical service is suggested.
+
+While a highly secure and roboust system, it does not excel at data processing speed and accuracy, and a very complex infrastructure is needed for this solution.
+
+
+Proposed solution
+Pros and cons
+
+AIci ma laud si citesc de pe slide, nu e ft ft complicat
+
+Proposed solution
+Conceptual Architecture
+
+I am proposing this telemetry system’s conceptual architecture , comprising of 4 main components:
+
+	• Transmitter LoRa (TxLoRa). Gathers the data from the ECU in a message that is 	transmitted every second, compresses the message and stores the data in the 	appropriate data structure to prepare it for transmission. Another step in the 	transmission is the encryption, adding it to the packet before the transmission. 	This approach provides the easy installation of the system with the current vehicle 	architecture, while also providing easy to maintain and read code and hardware, 	while also providing security and reliability, making this a very suitable option 	for incorporating the transmitter.
+
+	• Receiver LoRa (RxLoRa). Receives the packet from the transmission medium and 		decrypts the data, while also storing it in the adequate data structure. This 	provides a buffer for the data until it is stored in the local database, providing 	an extra level of redundancy, making the system more robust and resilient.
+
+	• Road-side Unit. It acts as the server, processing the data while providing a way 	for the users to connect to the User Interface, while also centalizing the data.
+
+		o Local database. Its purpose is to store the data locally for easy access 		on the user interface. This approach is knows as fog computing and is an 		ingenious way to provide very good response times for the interface with 		new data, while also having another layer which stores the data, adding 		redundancy and making the system all the more effective and efficient.
+
+		o User Interface. This is what the user sees and is responsible for 			displaying the data in a easy to read format, usually visualisations and 		the like for debugging and fault-finding. Getting the data straight from 		the local databse, its response time is very quick and can be easily 			modified.
+
+	• Cloud Database. The data is uploaded here after the transmission ended, providing 	a way to acces the data while it is not in real-time, proving very useful to the 	development team. It adds redundancy and a much needed feature in the automotive 	industry. 
+
+
+
+Technologies Used
+
+
+•	The transmission medium proposed is LoRa, a low-power, long-range wireless communication technology designed for sending small amounts of data over large distances, achieving 2-5 kilometers in an urban setting, while consuming very little power and offering good resistance to interference and obstacles due to spread spectrum transmission. It achieves the favorable distances by operating in the sub-GHz ISM bands, extending further under line-of-sight conditions, making it perfect for test conditions. 
+•	For the software technology stack, the proposed solution uses Docker, making it easy to deploy and run applications inside containers, offering accessibility to anyone in the team intending to be the server node. It streamlines development and maintenance, encapsulating the application along with its dependencies, libraries and runtime environment into portable units that can run consistently across various computing environments, this minimizing the “works on my machine” problem.
+•	In terms of database selection, I propose InfluxDB, a time-series database that is designed to handle large volumes of time-stamped data, including measurements and sensor reading, making it perfect for this context. It will store and process the data locally, as to not impact the performance of the real-time data visualization. InfluxDB is optimized for handling high write and query loads of time-indexed data, supporting advanced functions such as aggregation, downsampling, and retention policies.
+•	For the visualization of the data, Grafana is the preferred option, offering a quick and elegant solution to create an interactive and responsive dashboard. It has native integration with InfluxDB, making the connection seamless. Its support for various panel types and alerting mechanisms allows the team to monitor vehicle performance metrics in real time and receive notifications when parameters deviate from expected thresholds.
+•	For the persistence of the data, Firebase is used as a cloud service to store the data, and an in-house CSV plotting tool is then applied to visualize the data after the transmission ended. Firebase provides scalable data storage and synchronization capabilities, ensuring data durability and availability across distributed systems.
+•	The decision to use all these open-source solutions comes to cost. The components for this system are cheap, and the upkeep of the system is virtually free if we keep in mind the storage used by the Cloud service.
+
+
+
+Tehniques used
+
+•	The connection between the vehicle’s ECU and the telemetry system is done using CAN Bus (Controller-Area-Network) technology. While the CAN-Bus is specifically developed for automotive communication purposes, ISO-TP (ISO 15765-5) provides a much-needed feature in this system. By default, the CAN-Bus support only 8 bytes per CAN frame, but with ISO-TP, we can send as many bytes as necessary because it splits the large messages into multiple CAN frames and reassembling them on the receiving end. The adoption of ISO-TP provides the necessary scalability and flexibility to transmit extensive telemetry data, such as sensor arrays without compromising CAN-Bus’s real-time capabilities.
+
+
+Citeste de pe slide
+
+
+
+Testing
+Baga de pe slide, si aici e cam intuitiv
+
+
+Results
+La fel si aici
+
+
+conclusions
+
+To conclude, this project presents a powerful but low-cost solution for real-time telemetry in a Formula Student electric race car.
+
+It solves key problems like latency, encryption, modularity, and cost, while remaining easy to deploy and maintain.
+
+Future work includes integrating the system with the ECU, field testing during
+dynamic events, and refining the web-based dashboard for improved usability and
+real-time performance analysis.
